@@ -9,7 +9,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/Microsoft/hcsshim v0.11.7
 	github.com/containerd/aufs v1.0.0
-	github.com/containerd/btrfs/v2 v2.0.0
+	github.com/containerd/btrfs v1.0.0
 	github.com/containerd/cgroups/v3 v3.0.2
 	github.com/containerd/console v1.0.3
 	github.com/containerd/containerd/api v1.8.0
