@@ -17,20 +17,21 @@
 package btrfs
 
 /*
-#include "btrfs.h"
+#include <stddef.h>
+#include <btrfs/ioctl.h>
+#include <btrfs/ctree.h>
 */
 import "C"
 
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"os"
 	"strings"
 	"unsafe"
 
-	"golang.org/x/sys/cpu"
+	"github.com/pkg/errors"
 )
 
 func subvolID(fd uintptr) (uint64, error) {
@@ -49,7 +50,7 @@ var (
 	zeros     = zeroArray[:]
 )
 
-func uuidString(uuid *[C.BTRFS_UUID_SIZE]C.__u8) string {
+func uuidString(uuid *[C.BTRFS_UUID_SIZE]C.u8) string {
 	b := (*[maxByteSliceSize]byte)(unsafe.Pointer(uuid))[:C.BTRFS_UUID_SIZE]
 
 	if bytes.Equal(b, zeros) {
@@ -57,24 +58,6 @@ func uuidString(uuid *[C.BTRFS_UUID_SIZE]C.__u8) string {
 	}
 
 	return fmt.Sprintf("%x-%x-%x-%x-%x", b[:4], b[4:4+2], b[6:6+2], b[8:8+2], b[10:16])
-}
-
-func le16ToNative(le16 C.__le16) uint16 {
-	if cpu.IsBigEndian {
-		b := make([]byte, 2)
-		binary.LittleEndian.PutUint16(b, uint16(le16))
-		return binary.BigEndian.Uint16(b)
-	}
-	return uint16(le16)
-}
-
-func le64ToNative(le64 C.__le64) uint64 {
-	if cpu.IsBigEndian {
-		b := make([]byte, 8)
-		binary.LittleEndian.PutUint64(b, uint64(le64))
-		return binary.BigEndian.Uint64(b)
-	}
-	return uint64(le64)
 }
 
 func findMountPoint(path string) (string, error) {
@@ -112,7 +95,7 @@ func findMountPoint(path string) (string, error) {
 	}
 
 	if mount == "" {
-		return "", fmt.Errorf("mount point of %v not found", path)
+		return "", errors.Errorf("mount point of %v not found", path)
 	}
 
 	return mount, nil
