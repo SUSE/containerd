@@ -64,8 +64,6 @@ import (
 	"github.com/containerd/containerd/sys"
 	"github.com/containerd/log"
 	"github.com/containerd/platforms"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // CreateTopLevelDirectories creates the top-level root and state directories.
@@ -206,37 +204,9 @@ func New(ctx context.Context, config *srvconfig.Config) (*Server, error) {
 		RegisterTTRPC(*ttrpc.Server) error
 	}
 
-	// pathValidationInterceptor handles Unary RPCs (simple Request/Response)
-	pathValidationInterceptor := func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		// If the path is empty or doesn't start with '/', it's a bypass attempt.
-		if info.FullMethod == "" || info.FullMethod[0] != '/' {
-			return nil, status.Errorf(codes.Unimplemented, "malformed method name")
-		}
-		return handler(ctx, req)
-	}
-
-	// pathValidationStreamInterceptor handles Streaming RPCs (Logs, Events, etc.)
-	pathValidationStreamInterceptor := func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		// Same logic as Unary, but using StreamServerInfo
-		if info.FullMethod == "" || info.FullMethod[0] != '/' {
-			return status.Errorf(codes.Unimplemented, "malformed method name")
-		}
-		return handler(srv, ss)
-	}
-
-	// 1. Prepare the security shield options
-	securityShield := []grpc.ServerOption{
-		grpc.ChainUnaryInterceptor(pathValidationInterceptor),
-		grpc.ChainStreamInterceptor(pathValidationStreamInterceptor),
-	}
-
 	var (
-		// 2. Initialize the gRPC Server
-		// We append the shield to your existing options and use '...' to unpack them
-		grpcServer = grpc.NewServer(append(serverOpts, securityShield...)...)
-
-		// 3. Initialize the TCP Server
-		tcpServer = grpc.NewServer(append(tcpServerOpts, securityShield...)...)
+		grpcServer = grpc.NewServer(serverOpts...)
+		tcpServer  = grpc.NewServer(tcpServerOpts...)
 
 		grpcServices  []grpcService
 		tcpServices   []tcpService
