@@ -92,9 +92,9 @@ github.com/cilium/ebpf/internal/sys
 github.com/cilium/ebpf/internal/tracefs
 github.com/cilium/ebpf/internal/unix
 github.com/cilium/ebpf/link
-# github.com/containerd/btrfs/v2 v2.0.0
+# github.com/containerd/btrfs v1.0.1
 ## explicit; go 1.19
-github.com/containerd/btrfs/v2
+github.com/containerd/btrfs
 # github.com/containerd/cgroups/v3 v3.0.3
 ## explicit; go 1.18
 github.com/containerd/cgroups/v3
@@ -629,7 +629,6 @@ golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 # golang.org/x/sys v0.34.0
 ## explicit; go 1.23.0
-golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
