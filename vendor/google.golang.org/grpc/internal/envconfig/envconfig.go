@@ -126,6 +126,16 @@ var (
 	// enabled by setting the env variable
 	// GRPC_EXPERIMENTAL_ENABLE_PRIORITY_LB_CHILD_POLICY_CACHE to true.
 	EnablePriorityLBChildPolicyCache = boolFromEnv("GRPC_EXPERIMENTAL_ENABLE_PRIORITY_LB_CHILD_POLICY_CACHE", false)
+
+	// EnableReceiveBufferCompaction enables the compaction of data buffers
+	// to reduce the number of buffers in the receive buffer.
+	//
+	// This environment variable serves as an escape hatch to disable the
+	// feature if unforeseen issues arise, and it will be removed in a future
+	// release.
+	//
+	// TODO: Remove this env var once v1.85.0 is released.
+	EnableReceiveBufferCompaction = boolFromEnv("GRPC_GO_EXPERIMENTAL_ENABLE_RECEIVE_BUFFER_COMPACTION", true)
 )
 
 func boolFromEnv(envVar string, def bool) bool {
